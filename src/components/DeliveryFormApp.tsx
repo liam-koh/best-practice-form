@@ -102,7 +102,13 @@ export default function DeliveryFormApp() {
 
   // 접수 API 모의
   const submitForm = async (data: any) => {
-    await submitDeliveryAPI(data);
+    try {
+      await submitDeliveryAPI(data);
+      setSubmitSuccess(true);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitSuccess(false);
+    }
   };
 
   const onLoadSavedData = async () => {
