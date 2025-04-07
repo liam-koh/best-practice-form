@@ -22,11 +22,12 @@ import {
 } from '@/components/ui/select';
 import {
   fetchDeliveryListAPI,
+  fetchItemAPI,
   fetchPriceAPI,
   fetchUserInfo,
   submitDeliveryAPI,
 } from '@/api';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery } from '@tanstack/react-query';
 
 const DeliveryFormSchema = z.object({
   // string or null
@@ -56,6 +57,10 @@ const defaultForm: MDeliveryForm = {
 };
 
 export default function DeliveryFormApp() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(true);
+  const [items, setItems] = useState<string[]>([]);
+
   const methods = useForm({
     resolver: zodResolver(DeliveryFormSchema),
     mode: 'onChange',
@@ -71,10 +76,16 @@ export default function DeliveryFormApp() {
     initForm();
   });
 
-  const { register, watch, setValue, handleSubmit, reset, formState } = methods;
+  useEffect(() => {
+    const initItems = async () => {
+      const res = await fetchItemAPI();
+      setValue('item', res.items[0]);
+      setItems(res.items);
+    };
+    initItems();
+  }, []);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(true);
+  const { register, watch, setValue, handleSubmit, reset, formState } = methods;
 
   const { data: estimatedPrice, isLoading } = useQuery({
     queryKey: [
@@ -131,29 +142,31 @@ export default function DeliveryFormApp() {
           onSubmit={handleSubmit(submitForm)}
           className="w-full flex justify-start items-start flex-col gap-4 p-4"
         >
-          <div className="w-full flex flex-col gap-2">
-            <h2 className="font-semibold">배송 물품 선택</h2>
-            <div>
-              <Select
-                value={watch('item')}
-                onValueChange={(value) => setValue('item', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="배송 물품 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>배송 물품 선택</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+          {items && (
+            <div className="w-full flex flex-col gap-2">
+              <h2 className="font-semibold">배송 물품 선택</h2>
+              <div>
+                <Select
+                  value={watch('item')}
+                  onValueChange={(value) => setValue('item', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="배송 물품 선택" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>배송 물품 선택</SelectLabel>
+                      {items?.map((item) => (
+                        <SelectItem key={item} value={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
+          )}
           <div className="w-full">
             <h2 className="font-semibold">출발지 정보</h2>
             <Input
