@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, ResolverOptions } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { fetchDeliveryListAPI, fetchPriceAPI, submitDeliveryAPI } from '@/api';
+import {
+  fetchDeliveryListAPI,
+  fetchPriceAPI,
+  fetchUserInfo,
+  submitDeliveryAPI,
+} from '@/api';
 import { useQuery } from '@tanstack/react-query';
 
 const DeliveryFormSchema = z.object({
@@ -40,19 +45,30 @@ const DeliveryFormSchema = z.object({
 
 export type MDeliveryForm = z.infer<typeof DeliveryFormSchema>;
 
-const mockItems = [
-  { category: '과일류', options: ['사과', '바나나'] },
-  { category: '곡물류', options: ['쌀', '보리'] },
-];
+const defaultForm: MDeliveryForm = {
+  item: null,
+  sender: {
+    name: '',
+    phone: '',
+    address: '',
+  },
+  receiver: { name: '', phone: '', address: '' },
+};
 
 export default function DeliveryFormApp() {
   const methods = useForm({
     resolver: zodResolver(DeliveryFormSchema),
     mode: 'onChange',
-    defaultValues: {
-      item: null,
-      sender: { name: '', phone: '', address: '' },
-      receiver: { name: '', phone: '', address: '' },
+    defaultValues: async () => {
+      const userInfo = await fetchUserInfo();
+      return {
+        ...defaultForm,
+        sender: {
+          name: userInfo.name,
+          phone: userInfo.phone,
+          address: userInfo.address,
+        },
+      };
     },
   });
 
@@ -84,12 +100,6 @@ export default function DeliveryFormApp() {
     placeholderData: (prev) => prev,
   });
 
-  console.log(
-    watch('item'),
-    watch('sender.address'),
-    watch('receiver.address'),
-  );
-
   // 접수 API 모의
   const submitForm = async (data: any) => {
     await submitDeliveryAPI(data);
@@ -110,20 +120,20 @@ export default function DeliveryFormApp() {
   };
 
   return (
-    <main className="w-screen h-screen">
+    <main className="max-w-[50vw] h-screen">
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(submitForm)}
           className="w-full flex justify-start items-start flex-col gap-4 p-4"
         >
-          <div className="flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-2">
             <h2 className="font-semibold">배송 물품 선택</h2>
-            <div className="w-1/2">
+            <div>
               <Select
                 value={watch('item')}
                 onValueChange={(value) => setValue('item', value)}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger>
                   <SelectValue placeholder="배송 물품 선택" />
                 </SelectTrigger>
                 <SelectContent>
@@ -139,28 +149,42 @@ export default function DeliveryFormApp() {
               </Select>
             </div>
           </div>
-          {(['sender', 'receiver'] as const).map((type) => (
-            <div key={type}>
-              <h2 className="font-semibold">
-                {type === 'sender' ? '출발지 정보' : '도착지 정보'}
-              </h2>
-              <Input
-                {...register(`${type}.name`)}
-                placeholder="이름"
-                className="mt-2"
-              />
-              <Input
-                {...register(`${type}.phone`)}
-                placeholder="전화번호"
-                className="mt-2"
-              />
-              <Input
-                {...register(`${type}.address`)}
-                placeholder="주소"
-                className="mt-2"
-              />
-            </div>
-          ))}
+          <div className="w-full">
+            <h2 className="font-semibold">출발지 정보</h2>
+            <Input
+              {...register(`sender.name`)}
+              placeholder="이름"
+              className="mt-2"
+            />
+            <Input
+              {...register(`sender.phone`)}
+              placeholder="전화번호"
+              className="mt-2"
+            />
+            <Input
+              {...register(`sender.address`)}
+              placeholder="주소"
+              className="mt-2"
+            />
+          </div>
+          <div className="w-full">
+            <h2 className="font-semibold">도착지 정보</h2>
+            <Input
+              {...register(`receiver.name`)}
+              placeholder="이름"
+              className="mt-2"
+            />
+            <Input
+              {...register(`receiver.phone`)}
+              placeholder="전화번호"
+              className="mt-2"
+            />
+            <Input
+              {...register(`receiver.address`)}
+              placeholder="주소"
+              className="mt-2"
+            />
+          </div>
           <div className="flex justify-between gap-2">
             <h2 className="font-semibold">예상 배송비</h2>
             <p className="text-lg font-bold">

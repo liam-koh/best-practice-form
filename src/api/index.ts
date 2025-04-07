@@ -5,6 +5,23 @@ interface TFetchPriceAPIRequest {
 }
 
 /**
+ * 유저 정보 호출 API
+ */
+export const fetchUserInfo = async () => {
+  // Mock API call
+  return new Promise<any>((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: 'user123',
+        name: '홍길동',
+        phone: '010-1234-5678',
+        address: '서울특별시 강남구 역삼동 123-45',
+      });
+    }, 1000);
+  });
+};
+
+/**
  * 물품 종류 호출 API
  */
 export const fetchItemAPI = async () => {
