@@ -11,16 +11,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 const DeliveryFormSchema = z.object({
-  items: z
-    .array(
-      z.object({
-        category: z.string(),
-        name: z.string(),
-        quantity: z.number().min(1),
-      }),
-    )
-    .min(1),
+  // string or null
+  item: z.string().nullable(),
   sender: z.object({
     name: z.string().min(1),
     phone: z.string().min(1),
@@ -33,6 +36,8 @@ const DeliveryFormSchema = z.object({
   }),
 });
 
+type TForm = z.infer<typeof DeliveryFormSchema>;
+
 const mockItems = [
   { category: '과일류', options: ['사과', '바나나'] },
   { category: '곡물류', options: ['쌀', '보리'] },
@@ -43,7 +48,7 @@ export default function DeliveryFormApp() {
     resolver: zodResolver(DeliveryFormSchema),
     mode: 'onChange',
     defaultValues: {
-      items: [],
+      item: null,
       sender: { name: '', phone: '', address: '' },
       receiver: { name: '', phone: '', address: '' },
     },
@@ -89,61 +94,29 @@ export default function DeliveryFormApp() {
     <FormProvider {...methods}>
       <form
         onSubmit={handleSubmit(submitForm)}
-        className="max-w-xl mx-auto space-y-6 p-4"
+        className="w-full flex justify-start items-start flex-col gap-4 p-4"
       >
-        <div>
-          <h2 className="font-semibold">배송 물품 선택</h2>
-          {mockItems.map((group) => (
-            <div key={group.category} className="mt-2">
-              <p className="font-medium">{group.category}</p>
-              {group.options.map((item) => {
-                const matched = values.items.find((i: any) => i.name === item);
-                return (
-                  <div key={item} className="flex items-center gap-2 mt-1">
-                    <input
-                      type="checkbox"
-                      checked={!!matched}
-                      onChange={(e) => {
-                        const current = values.items || [];
-                        if (e.target.checked) {
-                          setValue('items', [
-                            ...current,
-                            {
-                              category: group.category,
-                              name: item,
-                              quantity: 1,
-                            },
-                          ]);
-                        } else {
-                          setValue(
-                            'items',
-                            current.filter((i: any) => i.name !== item),
-                          );
-                        }
-                      }}
-                    />
-                    <span>{item}</span>
-                    {matched && (
-                      <Input
-                        type="number"
-                        className="w-24"
-                        value={matched.quantity}
-                        min={1}
-                        onChange={(e) => {
-                          const updated = values.items.map((i: any) =>
-                            i.name === item
-                              ? { ...i, quantity: Number(e.target.value) }
-                              : i,
-                          );
-                          setValue('items', updated);
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+        <div className='flex flex-col gap-2'>
+          <h2 className="font-semibold">
+            배송 물품 선택
+          </h2>
+          <div className="w-1/2">
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="배송 물품 선택" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>배송 물품 선택</SelectLabel>
+                  <SelectItem value="apple">Apple</SelectItem>
+                  <SelectItem value="banana">Banana</SelectItem>
+                  <SelectItem value="blueberry">Blueberry</SelectItem>
+                  <SelectItem value="grapes">Grapes</SelectItem>
+                  <SelectItem value="pineapple">Pineapple</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {(['sender', 'receiver'] as const).map((type) => (
@@ -176,13 +149,7 @@ export default function DeliveryFormApp() {
         </div>
 
         <div className="flex gap-2">
-          <Button type="button" onClick={saveTemp} variant="outline">
-            임시저장
-          </Button>
-          <Button type="button" onClick={loadTemp} variant="secondary">
-            불러오기
-          </Button>
-          <Button type="submit" disabled={!formState.isValid}>
+          <Button type="submit" size="default" disabled={!formState.isValid}>
             접수하기
           </Button>
         </div>
