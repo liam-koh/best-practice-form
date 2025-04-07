@@ -59,17 +59,16 @@ export default function DeliveryFormApp() {
   const methods = useForm({
     resolver: zodResolver(DeliveryFormSchema),
     mode: 'onChange',
-    defaultValues: async () => {
+  });
+
+  useEffect(() => {
+    const initForm = async () => {
       const userInfo = await fetchUserInfo();
-      return {
-        ...defaultForm,
-        sender: {
-          name: userInfo.name,
-          phone: userInfo.phone,
-          address: userInfo.address,
-        },
-      };
-    },
+      setValue('sender.name', userInfo.name);
+      setValue('sender.phone', userInfo.phone);
+      setValue('sender.address', userInfo.address);
+    };
+    initForm();
   });
 
   const { register, watch, setValue, handleSubmit, reset, formState } = methods;
