@@ -1,8 +1,8 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import { queryClient } from '@/hooks/useDeliveryHooks';
+import { QueryClientProvider } from '@tanstack/react-query';
 
-const qc = new QueryClient();
-
-export default function AppLayout({ children }) {
-  return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 }

@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { fetchDeliveryListAPI, submitDeliveryAPI } from '@/api';
-import { useEstimatedPrice, useUserInfo } from '@/hooks/useDeliveryHooks';
 import DeliveryItemSelect from './DeliveryItemSelect';
 import DeliverySenderInputGroup from './DeliverySenderInputGroup';
 import DeliveryReceiverInputGroup from './DeliveryReceiverInputGroup';

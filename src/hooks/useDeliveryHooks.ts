@@ -1,8 +1,8 @@
-import React from 'react';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { fetchUserInfo } from '@/api';
 import { fetchPriceAPI } from '@/api';
-import { useWatch } from 'react-hook-form';
+
+export const queryClient = new QueryClient();
 
 export const userInfoQueryOptions = {
   queryKey: ['userInfo'],
@@ -33,7 +33,7 @@ export function useEstimatedPrice({
       console.log('response', response);
       return response.price;
     },
-    enabled: Boolean(item && senderAddress && receiverAddress),
+    enabled: Boolean(),
     placeholderData: (prev) => prev,
   };
 
