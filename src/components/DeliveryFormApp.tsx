@@ -33,21 +33,23 @@ export default function DeliveryFormApp() {
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-full flex justify-center items-end">
-        Loading...
-      </div>
-    );
-  }
-
-  if (isError) {
-    return <div>접수할 수 없습니다. 나중에 다시 시도해주세요</div>;
-  }
-
   return (
-    <FormProvider {...methods}>
-      <DeliveryFormView />
-    </FormProvider>
+    <main className="max-w-[50vw] h-screen">
+      {isLoading && (
+        <div className="w-full h-full flex justify-center items-center">
+          Loading...
+        </div>
+      )}
+      {isError && (
+        <div className="w-full h-full flex justify-center items-center">
+          접수할 수 없습니다. 나중에 다시 시도해주세요
+        </div>
+      )}
+      {!isLoading && !isError && (
+        <FormProvider {...methods}>
+          <DeliveryFormView />
+        </FormProvider>
+      )}
+    </main>
   );
 }

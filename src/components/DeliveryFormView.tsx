@@ -50,7 +50,7 @@ export default function DeliveryFormView() {
   };
 
   return (
-    <main className="max-w-[50vw] h-screen">
+    <>
       <form
         onSubmit={handleSubmit(submitForm)}
         className="w-full flex justify-start items-start flex-col gap-4 p-4"
@@ -95,6 +95,6 @@ export default function DeliveryFormView() {
           </DialogHeader>
         </DialogContent>
       </Dialog>
-    </main>
+    </>
   );
 }
