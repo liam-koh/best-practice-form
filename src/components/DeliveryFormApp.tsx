@@ -35,6 +35,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEstimatedPrice, useUserInfo } from '@/hooks/useDeliveryHooks';
 import DeliveryFormSchema from '@/utils/delivery-validaation';
 import DeliveryFormView from './DeliveryFormView';
+import defaultDeliveryForm from '@/constants/defaultDeliveryForm';
 
 export default function DeliveryFormApp() {
   const methods = useForm({
@@ -43,7 +44,7 @@ export default function DeliveryFormApp() {
     defaultValues: async () => {
       const userInfo = await fetchUserInfo();
       return {
-        ...defaultForm,
+        ...defaultDeliveryForm,
         sender: {
           name: userInfo.name,
           phone: userInfo.phone,

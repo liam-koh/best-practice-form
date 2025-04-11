@@ -1,6 +1,6 @@
 import { MDeliveryForm } from '@/types/delivery.interface';
 
-const defaultForm: MDeliveryForm = {
+const defaultDeliveryForm: MDeliveryForm = {
   item: null,
   sender: {
     name: '',
@@ -10,4 +10,4 @@ const defaultForm: MDeliveryForm = {
   receiver: { name: '', phone: '', address: '' },
 };
 
-export default defaultForm;
+export default defaultDeliveryForm;
