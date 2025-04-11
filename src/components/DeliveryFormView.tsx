@@ -1,37 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {
-  useForm,
-  FormProvider,
-  ResolverOptions,
-  useFormContext,
-} from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  fetchDeliveryListAPI,
-  fetchPriceAPI,
-  fetchUserInfo,
-  submitDeliveryAPI,
-} from '@/api';
-import { useQuery } from '@tanstack/react-query';
+import { fetchDeliveryListAPI, submitDeliveryAPI } from '@/api';
 import { useEstimatedPrice, useUserInfo } from '@/hooks/useDeliveryHooks';
 import DeliveryItemSelect from './DeliveryItemSelect';
 import DeliverySenderInputGroup from './DeliverySenderInputGroup';
@@ -48,8 +24,6 @@ export default function DeliveryFormView() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(true);
-
-  const { data: userInfo } = useUserInfo();
 
   // 접수 API 모의
   const submitForm = async (data: any) => {
