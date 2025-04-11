@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, FormProvider, ResolverOptions } from 'react-hook-form';
+import {
+  useForm,
+  FormProvider,
+  ResolverOptions,
+  useFormContext,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -27,6 +32,7 @@ import {
   submitDeliveryAPI,
 } from '@/api';
 import { useQuery } from '@tanstack/react-query';
+import { useEstimatedPrice, useUserInfo } from '@/hooks/useDeliveryHooks';
 
 const DeliveryFormSchema = z.object({
   // string or null
@@ -72,32 +78,26 @@ export default function DeliveryFormApp() {
     },
   });
 
+  return (
+    <FormProvider {...methods}>
+      <DeliveryFormView />
+    </FormProvider>
+  );
+}
+
+function DeliveryFormView() {
+  const methods = useFormContext<MDeliveryForm>();
   const { register, watch, setValue, handleSubmit, reset, formState } = methods;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(true);
 
-  const { data: estimatedPrice, isLoading } = useQuery({
-    queryKey: [
-      'price',
-      watch('item'),
-      watch('sender.address'),
-      watch('receiver.address'),
-    ],
-    queryFn: async () => {
-      const response = await fetchPriceAPI({
-        item: watch('item'),
-        senderAddress: watch('sender.address'),
-        receiverAddress: watch('receiver.address'),
-      });
-      console.log('response', response);
-      return response.price;
-    },
-    enabled:
-      !!watch('item') &&
-      !!watch('sender.address') &&
-      !!watch('receiver.address'),
-    placeholderData: (prev) => prev,
+  const { data: userInfo } = useUserInfo();
+
+  const { data: estimatedPrice, isLoading } = useEstimatedPrice({
+    item: watch('item'),
+    senderAddress: watch('sender.address'),
+    receiverAddress: watch('receiver.address'),
   });
 
   // 접수 API 모의
