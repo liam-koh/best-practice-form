@@ -19,7 +19,14 @@ import DeliveryEstimatedFee from './DeliveryEstimatedFee';
  */
 export default function DeliveryFormView() {
   const methods = useFormContext<MDeliveryForm>();
-  const { register, watch, setValue, handleSubmit, reset, formState } = methods;
+  const {
+    register,
+    watch,
+    setValue,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = methods;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(true);
@@ -64,7 +71,7 @@ export default function DeliveryFormView() {
           receiverAddress={watch('receiver.address')}
         />
         <div className="flex justify-between gap-2">
-          <Button type="submit" size="default" disabled={!formState.isValid}>
+          <Button type="submit" size="default">
             접수하기
           </Button>
           <div className="flex gap-2">
